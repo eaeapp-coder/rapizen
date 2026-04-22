@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A product available in the store.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Product name" },
+        "description": { "type": "string", "description": "Product description" },
+        "price": { "type": "number", "description": "Product price" },
+        "originalPrice": { "type": "number", "description": "Original price if on sale" },
+        "image": { "type": "string", "description": "Product image URL" },
+        "category": { "type": "string", "description": "Product category" },
+        "aromas": { "type": "array", "description": "Available aromas" },
+        "featured": { "type": "boolean", "description": "If true, it's featured on home page" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "updatedAt": { "type": "number", "description": "Update timestamp" }
+      },
+      "required": ["name", "description", "price", "image", "category"]
+    },
+    "Combo": {
+      "title": "Combo",
+      "description": "A combo of products available in the store.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Combo name" },
+        "description": { "type": "string", "description": "Combo description" },
+        "price": { "type": "number", "description": "Combo price" },
+        "originalPrice": { "type": "number", "description": "Combo original price" },
+        "image": { "type": "string", "description": "Combo image URL" }
+      },
+      "required": ["name", "description", "price", "originalPrice", "image"]
+    },
+    "User": {
+      "title": "User",
+      "description": "A user of the application (admin).",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "description": "User role, e.g., admin" },
+        "email": { "type": "string", "description": "User email" }
+      },
+      "required": ["role", "email"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Store products"
+    },
+    "/combos/{comboId}": {
+      "schema": { "$ref": "#/entities/Combo" },
+      "description": "Store combos"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User roles and data"
+    }
+  }
+}
