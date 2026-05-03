@@ -49,29 +49,29 @@ export default function Combos() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-1 border border-primary/10"
+                className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-1 border border-primary/10 flex flex-col"
               >
-                <div className="bg-white rounded-[1.4rem] p-6 sm:p-8 h-full flex flex-col sm:flex-row gap-6 items-center relative pr-4 sm:pr-8">
-                  <Link to={`/combo/${combo.id}`} className="block shrink-0 w-full sm:w-64">
+                <div className="bg-white rounded-[1.4rem] p-5 sm:p-6 flex-1 flex flex-col sm:flex-row gap-6 relative">
+                  <Link to={`/combo/${combo.id}`} className="block shrink-0 w-full sm:w-48 overflow-hidden rounded-2xl">
                     <img 
                       src={combo.image} 
                       alt={combo.name} 
-                      className="w-full h-56 sm:h-64 rounded-2xl object-cover shadow-md transition-transform hover:scale-105"
+                      className="w-full h-56 sm:h-full object-cover shadow-md transition-transform hover:scale-105"
                       referrerPolicy="no-referrer"
                     />
                   </Link>
-                  <div className="flex-1 text-center sm:text-left flex flex-col h-full w-full">
+                  <div className="flex-1 flex flex-col min-h-0">
                     <Link to={`/combo/${combo.id}`}>
-                      <h3 className="font-bold text-2xl mb-2 text-primary hover:text-primary/80 transition-colors pr-10 sm:pr-0">{combo.name}</h3>
+                      <h3 className="font-bold text-xl mb-2 text-primary hover:text-primary/80 transition-colors pr-12 line-clamp-2">{combo.name}</h3>
                     </Link>
-                    <p className="text-gray-600 mb-4 flex-grow">{combo.description}</p>
+                    <p className="text-gray-600 mb-4 flex-grow text-sm">{combo.description}</p>
                     
-                    <div className="bg-neutral/30 rounded-xl p-4 mb-4">
-                      <div className="flex items-center justify-center sm:justify-start gap-3">
-                        <span className="text-3xl font-bold text-secondary">${combo.price.toLocaleString('es-AR')}</span>
-                        <div className="flex flex-col items-start">
-                          <span className="text-sm text-gray-400 line-through">Normal: ${combo.originalPrice.toLocaleString('es-AR')}</span>
-                          <span className="text-xs font-bold text-accent">Ahorrás ${(combo.originalPrice - combo.price).toLocaleString('es-AR')}</span>
+                    <div className="bg-neutral/30 rounded-xl p-3 mb-4 sm:mb-0 mt-auto">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <span className="text-xl sm:text-2xl font-bold text-secondary">${combo.price.toLocaleString('es-AR')}</span>
+                        <div className="flex flex-col items-start leading-tight">
+                          <span className="text-xs text-gray-400 line-through">Normal: ${combo.originalPrice.toLocaleString('es-AR')}</span>
+                          <span className="text-[10px] font-bold text-accent">Ahorrás ${(combo.originalPrice - combo.price).toLocaleString('es-AR')}</span>
                         </div>
                       </div>
                     </div>
@@ -81,7 +81,7 @@ export default function Combos() {
                         e.preventDefault();
                         addItem({ ...combo, type: 'combo' });
                       }}
-                      className="absolute top-4 right-4 sm:bottom-8 sm:top-auto w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/30 hover:bg-accent/90 transition-all active:scale-90"
+                      className="absolute top-4 right-4 sm:bottom-6 sm:top-auto sm:right-6 w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/30 hover:bg-accent/90 transition-all active:scale-90"
                       aria-label="Agregar combo al carrito"
                     >
                       <Plus className="w-5 h-5" />
