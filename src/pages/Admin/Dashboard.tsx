@@ -3,31 +3,35 @@ import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, LogOut, Package, Gift, FileText, Settings, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Package, Gift, FileText, Settings, Sparkles, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import ProductForm from './ProductForm';
 import ComboForm from './ComboForm';
 import BlogForm from './BlogForm';
 import SettingsForm from './SettingsForm';
 import KaliZenForm from './KaliZenForm';
 import HeroForm from './HeroForm';
+import PromoCodeForm from './PromoCodeForm';
 
 export default function Dashboard() {
   const { isAdmin, loading, logout } = useAuth();
   const navigate = useNavigate();
   
-  const [activeTab, setActiveTab] = useState<'products' | 'combos' | 'posts' | 'settings' | 'kalizen' | 'hero'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'combos' | 'posts' | 'settings' | 'kalizen' | 'hero' | 'coupons'>('products');
   
   const [products, setProducts] = useState<any[]>([]);
   const [combos, setCombos] = useState<any[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<any[]>([]);
   
   const [isProductFormOpen, setIsProductFormOpen] = useState(false);
   const [isComboFormOpen, setIsComboFormOpen] = useState(false);
   const [isPostFormOpen, setIsPostFormOpen] = useState(false);
+  const [isCouponFormOpen, setIsCouponFormOpen] = useState(false);
   
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [editingCombo, setEditingCombo] = useState<any>(null);
   const [editingPost, setEditingPost] = useState<any>(null);
+  const [editingCoupon, setEditingCoupon] = useState<any>(null);
 
   const [itemToDelete, setItemToDelete] = useState<{id: string, collection: string} | null>(null);
 
@@ -47,9 +51,13 @@ export default function Dashboard() {
         const querySnapshot = await getDocs(collection(db, 'combos'));
         const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setCombos(data);
+      } else if (activeTab === 'coupons') {
+        const querySnapshot = await getDocs(collection(db, 'promos'));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setCoupons(data);
       } else {
         const querySnapshot = await getDocs(collection(db, 'posts'));
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
         const sorted = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setPosts(sorted);
       }
@@ -110,6 +118,16 @@ export default function Dashboard() {
     setIsPostFormOpen(true);
   };
 
+  const handleEditCoupon = (coupon: any) => {
+    setEditingCoupon(coupon);
+    setIsCouponFormOpen(true);
+  };
+
+  const handleAddNewCoupon = () => {
+    setEditingCoupon(null);
+    setIsCouponFormOpen(true);
+  };
+
   if (loading || !isAdmin) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
 
   return (
@@ -117,13 +135,24 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-secondary">Panel de Administración</h1>
-          <button 
-            onClick={logout}
-            className="flex items-center text-gray-600 hover:text-red-500 transition-colors"
-          >
-            <LogOut className="w-5 h-5 mr-2" />
-            Cerrar Sesión
-          </button>
+          <div className="flex items-center gap-6">
+            <a 
+              href="/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center text-gray-600 hover:text-primary transition-colors"
+            >
+              <ExternalLink className="w-5 h-5 mr-2" />
+              Ir al Sitio
+            </a>
+            <button 
+              onClick={logout}
+              className="flex items-center text-gray-600 hover:text-red-500 transition-colors"
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -173,6 +202,17 @@ export default function Dashboard() {
             Carrusel
           </button>
           <button
+            onClick={() => setActiveTab('coupons')}
+            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'coupons' 
+                ? 'bg-primary text-white shadow-md' 
+                : 'bg-white text-gray-600 hover:bg-white/80'
+            }`}
+          >
+            <Sparkles className="w-5 h-5 mr-2" />
+            Cupones
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`flex items-center px-6 py-3 rounded-xl font-medium transition-colors whitespace-nowrap ${
               activeTab === 'settings' 
@@ -209,11 +249,13 @@ export default function Dashboard() {
                 {activeTab === 'products' && 'Catálogo de Productos'}
                 {activeTab === 'combos' && 'Catálogo de Combos'}
                 {activeTab === 'posts' && 'Publicaciones del Blog'}
+                {activeTab === 'coupons' && 'Códigos Promocionales'}
               </h2>
               <button 
                 onClick={
                   activeTab === 'products' ? handleAddNewProduct : 
                   activeTab === 'combos' ? handleAddNewCombo : 
+                  activeTab === 'coupons' ? handleAddNewCoupon :
                   handleAddNewPost
                 }
                 className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center"
@@ -222,6 +264,7 @@ export default function Dashboard() {
                 {activeTab === 'products' && 'Nuevo Producto'}
                 {activeTab === 'combos' && 'Nuevo Combo'}
                 {activeTab === 'posts' && 'Nueva Publicación'}
+                {activeTab === 'coupons' && 'Nuevo Cupón'}
               </button>
             </div>
             
@@ -229,24 +272,35 @@ export default function Dashboard() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-neutral/30 text-gray-600 text-sm">
-                    <th className="p-4 font-medium">Imagen</th>
-                    <th className="p-4 font-medium">{activeTab === 'posts' ? 'Título' : 'Nombre'}</th>
+                    {activeTab !== 'coupons' && <th className="p-4 font-medium">Imagen</th>}
+                    <th className="p-4 font-medium">
+                      {activeTab === 'posts' ? 'Título' : activeTab === 'coupons' ? 'Código' : 'Nombre'}
+                    </th>
                     {activeTab === 'products' && <th className="p-4 font-medium">Categoría</th>}
                     {activeTab === 'posts' && <th className="p-4 font-medium">Fecha</th>}
-                    {activeTab !== 'posts' && <th className="p-4 font-medium">Precio</th>}
-                    {activeTab !== 'posts' && <th className="p-4 font-medium">Oferta</th>}
+                    {activeTab === 'coupons' && <th className="p-4 font-medium">Descuento</th>}
+                    {activeTab === 'coupons' && <th className="p-4 font-medium">Mínimo</th>}
+                    {activeTab === 'coupons' && <th className="p-4 font-medium">Estado</th>}
+                    {activeTab !== 'posts' && activeTab !== 'coupons' && <th className="p-4 font-medium">Precio</th>}
+                    {activeTab !== 'posts' && activeTab !== 'coupons' && <th className="p-4 font-medium">Oferta</th>}
                     <th className="p-4 font-medium text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(activeTab === 'products' ? products : activeTab === 'combos' ? combos : posts).map((item) => (
+                  {(activeTab === 'products' ? products : activeTab === 'combos' ? combos : activeTab === 'posts' ? posts : coupons).map((item) => (
                     <tr key={item.id} className="border-b border-neutral hover:bg-neutral/10">
-                      <td className="p-4">
-                        <img src={item.image} alt={item.name || item.title} className="w-12 h-12 rounded-lg object-cover" referrerPolicy="no-referrer" />
-                      </td>
+                      {activeTab !== 'coupons' && (
+                        <td className="p-4">
+                          <img src={item.image} alt={item.name || item.title} className="w-12 h-12 rounded-lg object-cover" referrerPolicy="no-referrer" />
+                        </td>
+                      )}
                       <td className="p-4 font-medium text-secondary">
                         <div className="flex items-center">
-                          {item.name || item.title}
+                          {activeTab === 'coupons' ? (
+                            <span className="font-mono bg-gray-100 px-2 py-1 rounded-md text-primary">{item.code}</span>
+                          ) : (
+                            item.name || item.title
+                          )}
                           {activeTab === 'products' && item.featured && (
                             <span title="Producto Destacado en Portada" className="ml-2 px-2 py-0.5 bg-accent/10 text-accent text-xs rounded-full border border-accent/20">
                               Destacado
@@ -256,8 +310,27 @@ export default function Dashboard() {
                       </td>
                       {activeTab === 'products' && <td className="p-4 text-gray-600 capitalize">{item.category}</td>}
                       {activeTab === 'posts' && <td className="p-4 text-gray-600">{new Date(item.date).toLocaleDateString('es-AR')}</td>}
-                      {activeTab !== 'posts' && <td className="p-4 text-primary font-bold">${item.price.toLocaleString('es-AR')}</td>}
-                      {activeTab !== 'posts' && (
+                      
+                      {activeTab === 'coupons' && (
+                        <td className="p-4">
+                          {item.type === 'percent' ? `${item.discount}%` : `$${item.discount.toLocaleString('es-AR')}`}
+                        </td>
+                      )}
+                      {activeTab === 'coupons' && (
+                        <td className="p-4 text-gray-500">
+                          ${(item.minPurchase || 0).toLocaleString('es-AR')}
+                        </td>
+                      )}
+                      {activeTab === 'coupons' && (
+                        <td className="p-4">
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${item.active ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                            {item.active ? 'ACTIVO' : 'INACTIVO'}
+                          </span>
+                        </td>
+                      )}
+
+                      {activeTab !== 'posts' && activeTab !== 'coupons' && <td className="p-4 text-primary font-bold">${item.price.toLocaleString('es-AR')}</td>}
+                      {activeTab !== 'posts' && activeTab !== 'coupons' && (
                         <td className="p-4 text-gray-500">
                           {item.originalPrice ? (
                             <span className="line-through text-sm">${item.originalPrice.toLocaleString('es-AR')}</span>
@@ -271,6 +344,7 @@ export default function Dashboard() {
                           onClick={() => {
                             if (activeTab === 'products') handleEditProduct(item);
                             else if (activeTab === 'combos') handleEditCombo(item);
+                            else if (activeTab === 'coupons') handleEditCoupon(item);
                             else handleEditPost(item);
                           }}
                           className="text-blue-500 hover:text-blue-700 p-2"
@@ -278,7 +352,7 @@ export default function Dashboard() {
                           <Edit className="w-5 h-5" />
                         </button>
                         <button 
-                          onClick={() => handleDeleteClick(item.id, activeTab)}
+                          onClick={() => handleDeleteClick(item.id, activeTab === 'coupons' ? 'promos' : activeTab)}
                           className="text-red-500 hover:text-red-700 p-2 ml-2"
                         >
                           <Trash2 className="w-5 h-5" />
@@ -286,10 +360,10 @@ export default function Dashboard() {
                       </td>
                     </tr>
                   ))}
-                  {(activeTab === 'products' ? products : activeTab === 'combos' ? combos : posts).length === 0 && (
+                  {(activeTab === 'products' ? products : activeTab === 'combos' ? combos : activeTab === 'posts' ? posts : coupons).length === 0 && (
                     <tr>
                       <td colSpan={6} className="p-8 text-center text-gray-500">
-                        No hay {activeTab === 'products' ? 'productos' : activeTab === 'combos' ? 'combos' : 'publicaciones'} cargados.
+                        No hay {activeTab === 'products' ? 'productos' : activeTab === 'combos' ? 'combos' : activeTab === 'coupons' ? 'cupones' : 'publicaciones'} cargados.
                       </td>
                     </tr>
                   )}
@@ -328,6 +402,17 @@ export default function Dashboard() {
           onClose={() => setIsPostFormOpen(false)} 
           onSave={() => {
             setIsPostFormOpen(false);
+            fetchData();
+          }} 
+        />
+      )}
+
+      {isCouponFormOpen && (
+        <PromoCodeForm 
+          promo={editingCoupon} 
+          onClose={() => setIsCouponFormOpen(false)} 
+          onSave={() => {
+            setIsCouponFormOpen(false);
             fetchData();
           }} 
         />

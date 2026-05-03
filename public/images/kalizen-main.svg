@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f3ef" />
+      <stop offset="100%" stop-color="#e2dfd8" />
+    </linearGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b58d6e" />
+      <stop offset="100%" stop-color="#8a6148" />
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d4c53" />
+      <stop offset="100%" stop-color="#1b2429" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="800" height="600" fill="url(#bg)" />
+  
+  <!-- Modern House Structure -->
+  <g transform="translate(150, 150)">
+    <!-- Main concrete block -->
+    <rect x="0" y="50" width="400" height="250" fill="#ecebe8" rx="8" />
+    <path d="M0,50 L400,50 L380,20 L20,20 Z" fill="#d0cec6" />
+    
+    <!-- Wooden curved extension -->
+    <path d="M300,50 L550,50 Q600,50 600,100 L600,250 Q600,300 550,300 L300,300 Z" fill="url(#wood)" />
+    
+    <!-- Large Glass Window -->
+    <rect x="350" y="80" width="220" height="190" fill="url(#glass)" rx="4" />
+    <rect x="350" y="80" width="220" height="190" fill="none" stroke="#2a2626" stroke-width="4" rx="4" />
+    <line x1="460" y1="80" x2="460" y2="270" stroke="#2a2626" stroke-width="4" />
+    <line x1="350" y1="175" x2="570" y2="175" stroke="#2a2626" stroke-width="4" />
+
+    <!-- Deck -->
+    <rect x="-50" y="300" width="600" height="20" fill="#8a6148" />
+    <rect x="-50" y="320" width="600" height="60" fill="#a48e7d" />
+  </g>
+  
+  <!-- Simple plant/tree silhouette -->
+  <path d="M100,470 Q120,400 150,470 Q130,350 160,470 Q180,420 180,470 Z" fill="#4d5c66" />
+  <path d="M700,470 Q680,380 650,470 Q670,320 630,470 Q600,400 610,470 Z" fill="#4d5c66" />
+</svg>

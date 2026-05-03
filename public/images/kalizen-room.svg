@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eae7de" />
+      <stop offset="100%" stop-color="#d1cdbf" />
+    </linearGradient>
+    <linearGradient id="bed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdfbf7" />
+      <stop offset="100%" stop-color="#e2dfd8" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="400" height="400" fill="url(#wall)" />
+  
+  <!-- Window -->
+  <rect x="40" y="50" width="120" height="180" fill="#8a9ba8" />
+  <rect x="40" y="50" width="120" height="180" fill="none" stroke="#ffffff" stroke-width="6" />
+  <line x1="100" y1="50" x2="100" y2="230" stroke="#ffffff" stroke-width="6" />
+  <line x1="40" y1="140" x2="160" y2="140" stroke="#ffffff" stroke-width="6" />
+  
+  <!-- Sunlight -->
+  <polygon points="40,230 160,230 260,400 0,400" fill="#ffffff" opacity="0.2" />
+  
+  <!-- Bed Headboard -->
+  <rect x="200" y="150" width="180" height="100" fill="#b58d6e" rx="4" />
+  
+  <!-- Bed -->
+  <rect x="180" y="220" width="220" height="140" fill="url(#bed)" rx="8" />
+  
+  <!-- Pillows -->
+  <rect x="220" y="180" width="60" height="40" fill="#ffffff" rx="8" shadow="true" />
+  <rect x="300" y="180" width="60" height="40" fill="#ffffff" rx="8" />
+  
+  <!-- Blanket -->
+  <path d="M180,280 Q290,260 400,280 L400,360 L180,360 Z" fill="#697a6f" />
+  
+  <!-- Side table -->
+  <rect x="140" y="220" width="40" height="60" fill="#38322c" />
+  <!-- Lamp -->
+  <rect x="155" y="190" width="10" height="30" fill="#a48e7d" />
+  <polygon points="160,160 140,190 180,190" fill="#fdfbf7" />
+</svg>

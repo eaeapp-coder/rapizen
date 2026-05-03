@@ -30,11 +30,11 @@ export default function Combos() {
     <div className="pt-32 pb-20 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 text-accent mb-6">
-            <Gift className="w-8 h-8" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
+            <Gift className="w-5 h-5" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-secondary mb-4">Nuestros Combos</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Nuestros Combos</h1>
+          <p className="text-gray-400 max-w-lg mx-auto text-sm">
             Diseñamos combos exclusivos para que ahorres y disfrutes de una experiencia aromática completa.
           </p>
         </div>
@@ -78,10 +78,10 @@ export default function Combos() {
 
                     <button 
                       onClick={() => addItem({ ...combo, type: 'combo' })}
-                      className="w-full inline-flex bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-medium transition-colors items-center justify-center"
+                      className="w-full inline-flex bg-primary hover:bg-primary/90 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 items-center justify-center active:scale-[0.98]"
                     >
-                      <ShoppingBag className="w-5 h-5 mr-2" />
-                      Agregar al carrito
+                      <ShoppingBag className="w-4 h-4 mr-2" />
+                      Lo quiero
                     </button>
                   </div>
                 </div>

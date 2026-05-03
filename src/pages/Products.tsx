@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ShoppingBag, Search } from 'lucide-react';
+import { Plus, Search, SlidersHorizontal, Heart } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
@@ -38,99 +38,109 @@ export default function Products() {
   });
 
   return (
-    <div className="pt-32 pb-20 bg-neutral/30 min-h-screen">
+    <div className="pt-32 pb-20 bg-[#F8F9FA] min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-secondary mb-4">Catálogo Completo</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">Explorá nuestros productos seleccionados para armonizar tu hogar.</p>
+        {/* Minimal Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="w-8"></div> {/* Spacer for centering if needed */}
+          <h1 className="text-base font-bold text-gray-900">Buscar Producto</h1>
+          <div className="w-8 h-8 bg-gray-200 rounded-full overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" alt="Avatar" className="w-full h-full object-cover" />
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="mb-10 flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        {/* Search Bar */}
+        <div className="flex gap-2 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Buscar aromas..." 
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-neutral focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="Ej. Sahumerios" 
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border-none shadow-sm focus:outline-none focus:ring-1 focus:ring-black text-gray-800 text-sm font-medium"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
-          <div className="flex overflow-x-auto w-full md:w-auto pb-2 md:pb-0 gap-2 hide-scrollbar">
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
-                  activeCategory === category 
-                    ? 'bg-primary text-white' 
-                    : 'bg-white text-secondary border border-neutral hover:bg-neutral/50'
-                }`}
-              >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </button>
-            ))}
-          </div>
+          <button className="bg-white p-2 rounded-xl shadow-sm text-gray-800 flex flex-col justify-center items-center w-10">
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
+        </div>
+        
+        {/* Categories (Optional, below search) */}
+        <div className="flex overflow-x-auto w-full gap-2 mb-6 hide-scrollbar pb-2">
+          {categories.map(category => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-xl whitespace-nowrap text-xs font-semibold transition-all ${
+                activeCategory === category 
+                  ? 'bg-accent text-white shadow-md' 
+                  : 'bg-white text-gray-600 shadow-sm hover:bg-gray-50'
+              }`}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Results Info */}
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 leading-tight">
+            Encontrado<br/>
+            {filteredProducts.length} Resultados
+          </h2>
         </div>
 
         {/* Grid */}
         {loading ? (
-          <div className="text-center py-20">Cargando catálogo...</div>
+          <div className="text-center py-20 text-gray-400 font-medium">Buscando productos...</div>
         ) : filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {filteredProducts.map((product) => (
               <motion.div 
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-neutral flex flex-col"
+                className="bg-white rounded-[1.5rem] flex flex-col relative shadow-[0_2px_15px_rgba(0,0,0,0.03)] overflow-hidden"
               >
-                <Link to={`/producto/${product.id}`} className="block h-56 overflow-hidden relative">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-2xl text-sm font-bold text-primary flex flex-col items-end leading-none shadow-sm">
-                    {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-[10px] text-gray-400 line-through mb-0.5">
-                        ${product.originalPrice.toLocaleString('es-AR')}
-                      </span>
-                    )}
-                    <span>${product.price.toLocaleString('es-AR')}</span>
-                  </div>
-                  <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white uppercase tracking-wider">
-                    {product.category}
+                <Link to={`/producto/${product.id}`} className="block w-full relative group">
+                  <div className="bg-[#F8F9FA] w-full h-40 sm:h-48 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
                 </Link>
-                <div className="p-5 flex flex-col flex-grow">
+                <div className="p-4 w-full flex flex-col">
                   <Link to={`/producto/${product.id}`}>
-                    <h3 className="font-bold text-lg mb-2 text-secondary hover:text-primary transition-colors">{product.name}</h3>
+                    <h3 className="font-bold text-gray-900 text-[15px] leading-tight mb-1">{product.name}</h3>
+                    <p className="text-gray-400 text-xs line-clamp-1">{product.category}</p>
                   </Link>
-                  <p className="text-gray-600 text-sm mb-4 flex-grow">{product.description}</p>
-                  <button 
-                    onClick={() => addItem({ ...product, type: 'product' })}
-                    className="w-full bg-accent hover:bg-accent/90 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center mt-auto"
-                  >
-                    <ShoppingBag className="w-4 h-4 mr-2" />
-                    Agregar al carrito
-                  </button>
+                  
+                  <div className="w-full flex items-center justify-between mt-4">
+                    <span className="font-bold text-gray-900 text-base">${product.price.toLocaleString('es-AR')}</span>
+                    <button 
+                      onClick={() => addItem({ ...product, type: 'product' })}
+                      className="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all active:scale-90"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
+                
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <div className="absolute top-3 left-3 bg-accent text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wide">
+                    OFERTA
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-xl text-gray-500">No se encontraron productos que coincidan con tu búsqueda.</p>
-            <button 
-              onClick={() => {setSearchTerm(''); setActiveCategory('todos');}}
-              className="mt-4 text-primary font-medium hover:underline"
-            >
-              Limpiar filtros
-            </button>
+            <p className="text-xl text-gray-400 font-medium">No se encontraron productos.</p>
           </div>
         )}
       </div>

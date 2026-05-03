@@ -22,6 +22,15 @@ export default function Home() {
     homeDescription: "Descubrí nuestra línea exclusiva de creaciones artesanales. Pulseras de macramé, llamadores de ángeles, porta sahumerios y amuletos hechos a mano con intención y energía.",
     homeImage: "https://eaeapp.com/imagenes-ia/rapizen/ejemplo-2.jpg"
   });
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { clientX, clientY, currentTarget } = e;
+    const { left, top, width, height } = currentTarget.getBoundingClientRect();
+    const x = ((clientX - left) / width) * 100;
+    const y = ((clientY - top) / height) * 100;
+    setMousePos({ x, y });
+  };
 
   const defaultSlides = [
     { image: 'https://images.unsplash.com/photo-1608501821300-4f99e58bba77?auto=format&fit=crop&q=80&w=1920', link: '/productos' },
@@ -61,7 +70,7 @@ export default function Home() {
         setFeaturedCombos(combosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
         const postsSnap = await getDocs(collection(db, 'posts'));
-        const postsData = postsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const postsData = postsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
         const sortedPosts = postsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setLatestPosts(sortedPosts.slice(0, 3));
 
@@ -127,7 +136,14 @@ export default function Home() {
     <>
       {/* Hero Carousel */}
       {heroSlides.length > 0 && (
-        <section className="relative w-full h-[180px] sm:h-[350px] md:h-[400px] lg:h-[500px] overflow-hidden mt-[76px]">
+        <section 
+          className="relative w-full h-[50vh] min-h-[300px] overflow-hidden mt-[76px]"
+          onMouseMove={handleMouseMove}
+        >
+          <div 
+            className="absolute inset-0 pointer-events-none transition duration-100 z-20" 
+            style={{ background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.05) 0%, transparent 40%)` }}
+          />
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -223,18 +239,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4-Column Categories Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      {/* Category Selectors */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((item) => (
-            <Link key={item} to="/productos" className="relative group overflow-hidden rounded-xl block">
-              <img 
-                src="https://eaeapp.com/imagenes-ia/rapizen/categorias.webp" 
-                alt={`Categoría ${item}`} 
-                className="w-full h-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-            </Link>
+          {[
+            { name: "Aromáticos", link: "/productos?categoria=aromaticos", image: "https://images.unsplash.com/photo-1595066930527-70519f19830b?auto=format&fit=crop&q=80&w=400" },
+            { name: "Limpieza", link: "/productos?categoria=limpieza", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=400" },
+            { name: "Sahumerios", link: "/productos?categoria=sahumerios", image: "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&q=80&w=400" },
+            { name: "Artesanal", link: "/productos?categoria=artesanal", image: "https://images.unsplash.com/photo-1604514813560-151950143890?auto=format&fit=crop&q=80&w=400" }
+          ].map((cat, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ scale: 1.05 }}
+              className="relative group overflow-hidden rounded-xl block shadow-md hover:shadow-2xl transition-all duration-300"
+            >
+              <Link to={cat.link}>
+                <img 
+                  src={cat.image} 
+                  alt={cat.name} 
+                  className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity group-hover:bg-black/20">
+                  <span className="text-white text-lg font-bold tracking-wider">{cat.name}</span>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -266,6 +296,11 @@ export default function Home() {
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                     referrerPolicy="no-referrer"
                   />
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <div className="absolute top-2 left-2 bg-accent text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wide z-10 shadow-sm uppercase">
+                      OFERTA
+                    </div>
+                  )}
                   <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-primary flex flex-col items-end leading-none shadow-sm">
                     {product.originalPrice && product.originalPrice > product.price && (
                       <span className="text-[10px] sm:text-xs text-gray-400 line-through mb-0.5">
@@ -511,70 +546,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Original Hero Section (Moved) */}
-      <section id="home" className="pt-20 pb-16 md:pt-24 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex items-center bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-6">
-              <Bike className="w-4 h-4 mr-2" />
-              Delivery Ecológico en Salta
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-secondary leading-tight mb-6">
-              Tu momento Zen, <br/>
-              <span className="text-primary">entregado en bicicleta.</span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-8 max-w-lg">
-              Aromatizantes, sahumerios y difusores en la puerta de tu casa en 1 a 2 horas. Relajate, nosotros pedaleamos por vos.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
-                to="/productos"
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-medium text-lg transition-colors flex items-center justify-center shadow-lg shadow-primary/30"
-              >
-                Ver Catálogo
-                <ChevronRight className="w-5 h-5 ml-1" />
-              </Link>
-              <a 
-                href={generateWhatsAppLink("Hola RapiZen, quiero hacer un pedido.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white border-2 border-accent text-accent hover:bg-accent/5 px-8 py-4 rounded-full font-medium text-lg transition-colors flex items-center justify-center"
-              >
-                <MessageCircle className="w-5 h-5 mr-2" />
-                Pedir por WhatsApp
-              </a>
-            </div>
-          </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-[2rem] transform rotate-3 scale-105 -z-10"></div>
-            <img 
-              src="https://images.unsplash.com/photo-1608501821300-4f99e58bba77?auto=format&fit=crop&q=80&w=800" 
-              alt="Productos de aromatización" 
-              className="rounded-[2rem] shadow-xl object-cover h-[400px] md:h-[500px] w-full"
-              referrerPolicy="no-referrer"
-            />
-          </motion.div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 bg-neutral/50 text-center">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-6">¿Listo para aromatizar tu espacio?</h2>
           <p className="text-gray-600 text-lg mb-8">Hacé tu pedido ahora y recibilo hoy mismo. Pagás cuando te lo entregamos.</p>
           <a 
-            href={generateWhatsAppLink("Hola RapiZen, quiero ver el catálogo completo y hacer un pedido.")}
+            href={generateWhatsAppLink("Hola RapiZen, quiero ver la tienda completa y hacer un pedido.")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-accent/30 items-center"

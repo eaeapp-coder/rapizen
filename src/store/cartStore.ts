@@ -19,7 +19,10 @@ interface CartStore {
   updateQuantity: (id: string, quantity: number, selectedAroma?: string) => void;
   clearCart: () => void;
   toggleCart: () => void;
+  appliedPromo: { code: string; discount: number; type: 'fixed' | 'percent' } | null;
+  setAppliedPromo: (promo: { code: string; discount: number; type: 'fixed' | 'percent' } | null) => void;
   getCartTotal: () => number;
+  getDiscountedTotal: () => number;
   getCartCount: () => number;
 }
 
@@ -28,6 +31,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      appliedPromo: null,
       addItem: (newItem) => {
         set((state) => {
           const qtyToAdd = newItem.quantity || 1;
@@ -59,10 +63,21 @@ export const useCartStore = create<CartStore>()(
             : state.items.filter((item) => !(item.id === id && item.selectedAroma === selectedAroma))
         }));
       },
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], appliedPromo: null }),
+      setAppliedPromo: (promo) => set({ appliedPromo: promo }),
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
       getCartTotal: () => {
         return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+      },
+      getDiscountedTotal: () => {
+        const total = get().getCartTotal();
+        const promo = get().appliedPromo;
+        if (!promo) return total;
+        
+        if (promo.type === 'percent') {
+          return Math.max(0, total * (1 - promo.discount / 100));
+        }
+        return Math.max(0, total - promo.discount);
       },
       getCartCount: () => {
         return get().items.reduce((count, item) => count + item.quantity, 0);

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="concrete" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b6b8b5" />
+      <stop offset="100%" stop-color="#8c8f8b" />
+    </linearGradient>
+    <linearGradient id="insulation" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d4b48c" />
+      <stop offset="100%" stop-color="#c29d6b" />
+    </linearGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8a6148" />
+      <stop offset="100%" stop-color="#5c3d2a" />
+    </linearGradient>
+  </defs>
+
+  <rect width="500" height="500" fill="#e5e4de" />
+  
+  <!-- Isometric block projection -->
+  <g transform="translate(250, 150) rotate(30) skewX(-30)">
+    <!-- Base concrete layer -->
+    <rect x="-100" y="150" width="200" height="50" fill="url(#concrete)" />
+    
+    <!-- White barrier layer -->
+    <rect x="-100" y="130" width="200" height="20" fill="#fdfbf7" />
+    
+    <!-- Insulation layer -->
+    <rect x="-100" y="50" width="200" height="80" fill="url(#insulation)" />
+    
+    <!-- Small wood studs -->
+    <rect x="-90" y="50" width="20" height="80" fill="url(#wood)" />
+    <rect x="-10" y="50" width="20" height="80" fill="url(#wood)" />
+    <rect x="70" y="50" width="20" height="80" fill="url(#wood)" />
+    
+    <!-- Top particle board -->
+    <rect x="-100" y="30" width="200" height="20" fill="#b58d6e" />
+    
+    <!-- Top floor finish (dark wood) -->
+    <rect x="-100" y="10" width="200" height="20" fill="url(#wood)" />
+    <line x1="-100" y1="20" x2="100" y2="20" stroke="#38322c" stroke-width="2" />
+    <line x1="-50" y1="10" x2="-50" y2="30" stroke="#38322c" stroke-width="2" />
+    <line x1="50" y1="10" x2="50" y2="30" stroke="#38322c" stroke-width="2" />
+  </g>
+  
+  <!-- Isometric top face -->
+  <g transform="translate(250, 150) rotate(-30) skewX(30)">
+    <rect x="-100" y="-100" width="200" height="200" fill="#704e38" opacity="0.9" />
+    <line x1="-50" y1="-100" x2="-50" y2="100" stroke="#4a3121" stroke-width="2" />
+    <line x1="0" y1="-100" x2="0" y2="100" stroke="#4a3121" stroke-width="2" />
+    <line x1="50" y1="-100" x2="50" y2="100" stroke="#4a3121" stroke-width="2" />
+  </g>
+
+  <!-- Isometric side face -->
+  <g transform="translate(250, 150) rotate(30) skewX(-30)">
+    <rect x="-100" y="-100" width="200" height="110" fill="#8c8f8b" opacity="0.4" />
+  </g>
+</svg>
