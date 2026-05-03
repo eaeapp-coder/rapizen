@@ -4,9 +4,10 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
 import { ShoppingBag, Star, Heart, Facebook, Instagram, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function KaliZen() {
+  const navigate = useNavigate();
   const [artesanalProducts, setArtesanalProducts] = useState<any[]>([]);
   const [pageData, setPageData] = useState({
     description: "KaliZen es una marca dedicada a la creación artesanal de pulseras de macramé, llamadores de ángeles, porta sahumerios y amuletos con medallas y runas. Cada pieza está hecha a mano con intención, conectando con la energía, la armonía y el misterio que habita en cada momento.",
@@ -297,7 +298,14 @@ export default function KaliZen() {
                     </div>
                     <p className="text-gray-500 text-xs sm:text-sm mb-4 sm:mb-8 flex-grow line-clamp-2 leading-relaxed">{product.description}</p>
                     <button 
-                      onClick={() => addItem({ ...product, type: 'product' })}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (product.aromas && product.aromas.length > 0) {
+                          navigate(`/producto/${product.id}`, { state: { showAromaError: true } });
+                        } else {
+                          addItem({ ...product, type: 'product' });
+                        }
+                      }}
                       className="w-full bg-gray-900 hover:bg-black text-white py-2.5 sm:py-4 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 transform active:scale-95 flex items-center justify-center mt-auto shadow-md hover:shadow-xl"
                     >
                       <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />

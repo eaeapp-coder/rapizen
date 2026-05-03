@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../../firebase';
 import { X } from 'lucide-react';
 
 interface ProductFormProps {
@@ -32,12 +33,35 @@ export default function ProductForm({ product, onClose, onSave }: ProductFormPro
     description: '',
     price: '',
     originalPrice: '',
-    image: '',
+    images: ['', '', ''] as string[],
     category: 'sahumerios',
     aromas: [] as string[],
     featured: false
   });
   const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState<number | null>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadLoading(index);
+      const file = e.target.files[0];
+      const storageRef = ref(storage, `images/${Date.now()}_${file.name}`);
+      try {
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        setFormData(prev => {
+          const newImages = [...prev.images];
+          newImages[index] = url;
+          return {...prev, images: newImages};
+        });
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("Error al subir la imagen");
+      } finally {
+        setUploadLoading(null);
+      }
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -46,7 +70,7 @@ export default function ProductForm({ product, onClose, onSave }: ProductFormPro
         description: product.description,
         price: product.price.toString(),
         originalPrice: product.originalPrice ? product.originalPrice.toString() : '',
-        image: product.image,
+        images: product.images || (product.image ? [product.image, '', ''] : ['', '', '']),
         category: product.category,
         aromas: product.aromas || [],
         featured: product.featured || false
@@ -67,8 +91,11 @@ export default function ProductForm({ product, onClose, onSave }: ProductFormPro
     e.preventDefault();
     setLoading(true);
     
+    const validImages = formData.images.filter(url => url.trim() !== '');
     const dataToSave: any = {
       ...formData,
+      image: validImages[0] || 'https://via.placeholder.com/400x400?text=Sin+Imagen',
+      images: validImages,
       price: Number(formData.price),
       updatedAt: Date.now()
     };
@@ -134,7 +161,7 @@ export default function ProductForm({ product, onClose, onSave }: ProductFormPro
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Precio Actual ($)</label>
               <input 
@@ -189,15 +216,33 @@ export default function ProductForm({ product, onClose, onSave }: ProductFormPro
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">URL de Imagen</label>
-            <input 
-              required
-              type="url" 
-              value={formData.image}
-              onChange={(e) => setFormData({...formData, image: e.target.value})}
-              className="w-full px-3 py-2 border border-neutral rounded-xl focus:ring-primary focus:border-primary"
-              placeholder="https://..."
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-2">Imágenes (hasta 3)</label>
+            <div className="space-y-4">
+              {formData.images.map((img, index) => (
+                <div key={index} className="p-3 border border-neutral rounded-xl bg-gray-50/50 space-y-2">
+                  <p className="text-xs font-semibold text-gray-500">Imagen {index + 1}</p>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, index)}
+                    disabled={uploadLoading === index}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 disabled:opacity-50"
+                  />
+                  {uploadLoading === index && <p className="text-xs text-primary">Subiendo...</p>}
+                  <input 
+                    type="url" 
+                    value={img}
+                    onChange={(e) => {
+                      const newImages = [...formData.images];
+                      newImages[index] = e.target.value;
+                      setFormData({...formData, images: newImages});
+                    }}
+                    className="w-full px-3 py-2 border border-neutral rounded-lg text-sm"
+                    placeholder="URL de imagen..."
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           <div>

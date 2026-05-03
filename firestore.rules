@@ -91,7 +91,7 @@ service cloud.firestore {
     // Domain Validators
     // ===============================================================
     function isValidProduct(data) {
-      return hasOnlyAllowedFields(['name', 'description', 'price', 'originalPrice', 'image', 'category', 'aromas', 'featured', 'createdAt', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['name', 'description', 'price', 'originalPrice', 'image', 'images', 'category', 'aromas', 'featured', 'createdAt', 'updatedAt']) &&
              data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
              data.description is string && data.description.size() > 0 && data.description.size() <= 1000 &&
              data.price is number && data.price >= 0 &&
@@ -101,6 +101,7 @@ service cloud.firestore {
              (!('createdAt' in data) || data.createdAt is number) &&
              (!('updatedAt' in data) || data.updatedAt is number) &&
              isValidUrl(data.image) &&
+             (!('images' in data) || (data.images is list && data.images.size() <= 3)) &&
              data.category is string && data.category.size() > 0 && data.category.size() <= 50;
     }
 

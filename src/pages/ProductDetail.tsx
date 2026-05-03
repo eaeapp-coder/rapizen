@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
@@ -9,14 +9,22 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedAromas, setSelectedAromas] = useState<Record<string, number>>({});
   const [baseQuantity, setBaseQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showErrorBanner, setShowErrorBanner] = useState(location.state?.showAromaError || false);
   const { addItem, toggleCart, getCartCount } = useCartStore();
   const cartCount = getCartCount();
+
+  useEffect(() => {
+    if (showErrorBanner) {
+      setTimeout(() => setShowErrorBanner(false), 3000);
+    }
+  }, [showErrorBanner]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -49,20 +57,25 @@ export default function ProductDetail() {
       }
       return { ...prev, [aroma]: next };
     });
+    setShowErrorBanner(false);
   };
 
   const handleAddToCart = () => {
     if (product.aromas && product.aromas.length > 0) {
       const selected = Object.entries(selectedAromas);
       if (selected.length === 0) {
-        alert("Por favor elegí al menos una fragancia y su cantidad.");
+        setShowErrorBanner(true);
+        setTimeout(() => setShowErrorBanner(false), 3000);
         return;
       }
       selected.forEach(([aroma, qty]) => {
         addItem({ ...product, type: 'product', selectedAroma: aroma, quantity: qty });
       });
+      setSelectedAromas({});
+      setBaseQuantity(1);
     } else {
       addItem({ ...product, type: 'product', quantity: baseQuantity });
+      setBaseQuantity(1);
     }
     // navigate('/checkout');
   };
@@ -221,7 +234,7 @@ export default function ProductDetail() {
           </p>
 
           {product.aromas && product.aromas.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-20">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Fragancias disponibles:</p>
               <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                 {product.aromas.map((aroma: string) => {
@@ -252,24 +265,24 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-50 flex-wrap gap-4">
-            <div className="flex flex-col">
-              <span className="text-3xl font-bold text-gray-900">${product.price.toLocaleString('es-AR')}</span>
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[400px] bg-white/90 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-full px-4 py-3 flex items-center justify-between border border-white/50 z-50">
+            <div className="flex flex-col pl-4">
+              <span className="text-xl font-bold text-gray-900 leading-none">${product.price.toLocaleString('es-AR')}</span>
             </div>
 
-            <div className="flex flex-1 items-center gap-2 md:gap-4 justify-end">
+            <div className="flex items-center gap-2 md:gap-4 justify-end">
               {(!product.aromas || product.aromas.length === 0) && (
-                <div className="flex items-center gap-2 bg-gray-50 rounded-full px-3 py-2 border border-gray-100 shrink-0">
+                <div className="flex items-center gap-2 bg-gray-100 rounded-full px-2 py-1 shrink-0">
                   <button 
                     onClick={() => setBaseQuantity(Math.max(1, baseQuantity - 1))}
-                    className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-xl bg-white rounded-full shadow-sm"
+                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-900 font-bold text-lg bg-white rounded-full shadow-sm"
                   >
                     -
                   </button>
-                  <span className="w-6 text-center font-bold text-gray-900 text-sm">{baseQuantity}</span>
+                  <span className="w-5 text-center font-bold text-gray-900 text-sm">{baseQuantity}</span>
                   <button 
                     onClick={() => setBaseQuantity(baseQuantity + 1)}
-                    className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-xl bg-white rounded-full shadow-sm"
+                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-900 font-bold text-lg bg-white rounded-full shadow-sm"
                   >
                     +
                   </button>
@@ -278,7 +291,7 @@ export default function ProductDetail() {
               
               <button 
                 onClick={handleAddToCart}
-                className="bg-accent hover:bg-accent/90 text-white px-8 md:px-10 py-4 rounded-[2rem] font-bold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex-1 max-w-[200px]"
+                className="bg-accent hover:bg-accent/90 text-white px-5 md:px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-accent/30 transition-all active:scale-95 shrink-0"
               >
                 Agregar
               </button>
@@ -286,6 +299,29 @@ export default function ProductDetail() {
           </div>
         </motion.div>
       </div>
+
+      {/* Error Banner */}
+      <AnimatePresence>
+        {showErrorBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.95 }}
+            className="fixed bottom-24 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[400px] bg-red-500/90 backdrop-blur-md text-white px-5 py-4 rounded-3xl shadow-2xl z-[150] flex items-center justify-between border border-red-400"
+          >
+            <div className="flex flex-col">
+              <span className="font-bold text-sm mb-0.5">¡Ups! Faltan opciones</span>
+              <span className="text-xs text-white/90 leading-tight">Por favor, seleccioná al menos una fragancia y cantidad antes de agregar al carrito.</span>
+            </div>
+            <button 
+              onClick={() => setShowErrorBanner(false)}
+              className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full shrink-0 ml-4 hover:bg-white/30 transition-colors"
+            >
+              <X className="w-4 h-4 text-white" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
     </div>
   );

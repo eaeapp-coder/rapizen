@@ -4,7 +4,8 @@ import { Plus, Search, SlidersHorizontal, Heart } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import ProductImageSlider from '../components/ProductImageSlider';
 
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,6 +13,7 @@ export default function Products() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCartStore();
+  const navigate = useNavigate();
 
   const categories = ['todos', 'sahumerios', 'perfumes', 'difusores', 'aromatizantes', 'accesorios', 'artesanal'];
 
@@ -104,30 +106,36 @@ export default function Products() {
                 className="bg-white rounded-[1.5rem] flex flex-col relative shadow-[0_2px_15px_rgba(0,0,0,0.03)] overflow-hidden"
               >
                 <Link to={`/producto/${product.id}`} className="block w-full relative group">
-                  <div className="bg-[#F8F9FA] w-full h-40 sm:h-48 flex items-center justify-center overflow-hidden">
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      referrerPolicy="no-referrer"
+                  <div className="bg-[#F8F9FA] w-full h-56 sm:h-72 flex items-center justify-center overflow-hidden">
+                    <ProductImageSlider 
+                      images={product.images || [product.image]} 
+                      name={product.name} 
                     />
                   </div>
                 </Link>
-                <div className="p-4 w-full flex flex-col">
+                <div className="p-4 w-full flex flex-col relative">
                   <Link to={`/producto/${product.id}`}>
-                    <h3 className="font-bold text-gray-900 text-[15px] leading-tight mb-1">{product.name}</h3>
+                    <h3 className="font-bold text-gray-900 text-[15px] leading-tight mb-1 pr-10">{product.name}</h3>
                     <p className="text-gray-400 text-xs line-clamp-1">{product.category}</p>
                   </Link>
                   
                   <div className="w-full flex items-center justify-between mt-4">
                     <span className="font-bold text-gray-900 text-base">${product.price.toLocaleString('es-AR')}</span>
-                    <button 
-                      onClick={() => addItem({ ...product, type: 'product' })}
-                      className="w-8 h-8 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/20 hover:bg-accent/90 transition-all active:scale-90"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
                   </div>
+                  
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (product.aromas && product.aromas.length > 0) {
+                        navigate(`/producto/${product.id}`, { state: { showAromaError: true } });
+                      } else {
+                        addItem({ ...product, type: 'product' });
+                      }
+                    }}
+                    className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/30 hover:bg-accent/90 transition-all active:scale-90"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
                 </div>
                 
                 {product.originalPrice && product.originalPrice > product.price && (

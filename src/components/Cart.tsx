@@ -160,6 +160,27 @@ export default function Cart() {
 
             {items.length > 0 && (
               <div className="p-6 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-gray-100 mt-2">
+                <div className="mb-6">
+                  <div className="flex justify-between text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wide">
+                    <span>{discountedTotal >= 15000 ? "¡Envío Gratis alcanzado!" : "Envío Gratis"}</span>
+                    {discountedTotal < 15000 && (
+                      <span>Faltan ${(15000 - discountedTotal).toLocaleString('es-AR')}</span>
+                    )}
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <motion.div 
+                      key="shipping-bar"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min((discountedTotal / 15000) * 100, 100)}%` }}
+                      className="h-full rounded-full transition-colors duration-500"
+                      style={{ 
+                        backgroundColor: discountedTotal >= 15000 
+                          ? '#22c55e' 
+                          : `hsl(${Math.min((discountedTotal / 15000) * 100, 100) * 0.4}, 80%, 50%)` 
+                      }}
+                    />
+                  </div>
+                </div>
                 {!appliedPromo ? (
                   <div className="flex flex-col gap-1 mb-6">
                     <div className="flex gap-2">
@@ -172,7 +193,7 @@ export default function Cart() {
                             setPromoCode(e.target.value);
                             setPromoError('');
                           }}
-                          className="w-full bg-gray-50 border border-transparent rounded-xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white text-gray-700 transition-all font-medium"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-xs focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white text-gray-700 transition-all font-medium"
                         />
                       </div>
                       <button 
@@ -232,7 +253,7 @@ export default function Cart() {
                   className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  Ir al Pago
+                  Finalizar pedido
                 </button>
               </div>
             )}

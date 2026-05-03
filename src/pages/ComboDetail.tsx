@@ -190,26 +190,26 @@ export default function ComboDetail() {
             {combo.description}
           </p>
 
-          <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-50 flex-wrap gap-4">
-            <div className="flex flex-col">
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[400px] bg-white/90 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-full px-4 py-3 flex items-center justify-between border border-white/50 z-50">
+            <div className="flex flex-col pl-4">
               {combo.originalPrice && combo.originalPrice > combo.price && (
-                <span className="text-xs text-gray-400 line-through mb-1">${combo.originalPrice.toLocaleString('es-AR')}</span>
+                <span className="text-[10px] text-gray-400 line-through md:mb-0.5 leading-none">${combo.originalPrice.toLocaleString('es-AR')}</span>
               )}
-              <span className="text-3xl font-bold text-gray-900">${combo.price.toLocaleString('es-AR')}</span>
+              <span className="text-xl font-bold text-gray-900 leading-none">${combo.price.toLocaleString('es-AR')}</span>
             </div>
 
-            <div className="flex flex-1 items-center gap-2 md:gap-4 justify-end">
-              <div className="flex items-center gap-2 bg-gray-50 rounded-full px-3 py-2 border border-gray-100 shrink-0">
+            <div className="flex items-center gap-2 md:gap-4 justify-end">
+              <div className="flex items-center gap-2 bg-gray-100 rounded-full px-2 py-1 shrink-0">
                 <button 
                   onClick={() => setBaseQuantity(Math.max(1, baseQuantity - 1))}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-xl bg-white rounded-full shadow-sm"
+                  className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-900 font-bold text-lg bg-white rounded-full shadow-sm"
                 >
                   -
                 </button>
-                <span className="w-6 text-center font-bold text-gray-900 text-sm">{baseQuantity}</span>
+                <span className="w-5 text-center font-bold text-gray-900 text-sm">{baseQuantity}</span>
                 <button 
                   onClick={() => setBaseQuantity(baseQuantity + 1)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 font-bold text-xl bg-white rounded-full shadow-sm"
+                  className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-900 font-bold text-lg bg-white rounded-full shadow-sm"
                 >
                   +
                 </button>
@@ -220,7 +220,7 @@ export default function ComboDetail() {
                   addItem({ ...combo, type: 'combo', quantity: baseQuantity });
                   // navigate('/checkout');
                 }}
-                className="bg-accent hover:bg-accent/90 text-white px-8 md:px-10 py-4 rounded-[2rem] font-bold text-sm shadow-lg shadow-accent/20 transition-all active:scale-95 flex-1 max-w-[200px]"
+                className="bg-accent hover:bg-accent/90 text-white px-5 md:px-6 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-accent/30 transition-all active:scale-95"
               >
                 Agregar
               </button>

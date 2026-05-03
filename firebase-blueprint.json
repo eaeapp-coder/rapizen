@@ -10,6 +10,7 @@
         "price": { "type": "number", "description": "Product price" },
         "originalPrice": { "type": "number", "description": "Original price if on sale" },
         "image": { "type": "string", "description": "Product image URL" },
+        "images": { "type": "array", "description": "Product images URLs" },
         "category": { "type": "string", "description": "Product category" },
         "aromas": { "type": "array", "description": "Available aromas" },
         "featured": { "type": "boolean", "description": "If true, it's featured on home page" },

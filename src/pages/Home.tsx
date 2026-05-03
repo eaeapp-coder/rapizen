@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { Bike, MessageCircle, MapPin, Clock, CreditCard, Truck, ChevronRight, ShoppingBag, Calendar, Sparkles, ChevronLeft } from 'lucide-react';
+import { Bike, MessageCircle, MapPin, Clock, CreditCard, Truck, ChevronRight, ShoppingBag, Calendar, Sparkles, ChevronLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { collection, getDocs, limit, query, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
 import { generateWhatsAppLink } from '../utils/whatsapp';
+import ProductImageSlider from '../components/ProductImageSlider';
 
 export default function Home() {
   const location = useLocation();
@@ -289,12 +290,10 @@ export default function Home() {
                 whileHover={{ y: -5 }}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-neutral flex flex-col"
               >
-                <Link to={`/producto/${product.id}`} className="block h-32 sm:h-48 overflow-hidden relative">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    referrerPolicy="no-referrer"
+                <Link to={`/producto/${product.id}`} className="block h-56 sm:h-72 overflow-hidden relative">
+                  <ProductImageSlider 
+                    images={product.images || [product.image]} 
+                    name={product.name} 
                   />
                   {product.originalPrice && product.originalPrice > product.price && (
                     <div className="absolute top-2 left-2 bg-accent text-white px-2 py-0.5 rounded text-[10px] font-bold tracking-wide z-10 shadow-sm uppercase">
@@ -310,17 +309,23 @@ export default function Home() {
                     <span>${product.price.toLocaleString('es-AR')}</span>
                   </div>
                 </Link>
-                <div className="p-3 sm:p-5 flex flex-col flex-grow">
+                <div className="p-3 sm:p-5 flex flex-col flex-grow relative">
                   <Link to={`/producto/${product.id}`}>
-                    <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-2 text-secondary hover:text-primary transition-colors line-clamp-2">{product.name}</h3>
+                    <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-2 text-secondary hover:text-primary transition-colors line-clamp-2 pr-10">{product.name}</h3>
                   </Link>
                   <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 flex-grow line-clamp-2 sm:line-clamp-3">{product.description}</p>
                   <button 
-                    onClick={() => addItem({ ...product, type: 'product' })}
-                    className="w-full bg-accent hover:bg-accent/90 text-white py-2 sm:py-3 rounded-xl font-medium text-xs sm:text-base transition-colors flex items-center justify-center mt-auto"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (product.aromas && product.aromas.length > 0) {
+                        navigate(`/producto/${product.id}`, { state: { showAromaError: true } });
+                      } else {
+                        addItem({ ...product, type: 'product' });
+                      }
+                    }}
+                    className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/30 hover:bg-accent/90 transition-all active:scale-90"
                   >
-                    <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    Agregar
+                    <Plus className="w-5 h-5" />
                   </button>
                 </div>
               </motion.div>

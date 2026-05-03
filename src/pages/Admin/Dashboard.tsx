@@ -133,9 +133,9 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-neutral/30 p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-secondary">Panel de Administración</h1>
-          <div className="flex items-center gap-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 sm:gap-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-secondary">Panel de Administración</h1>
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end">
             <a 
               href="/" 
               target="_blank" 
@@ -244,8 +244,8 @@ export default function Dashboard() {
           <HeroForm />
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-neutral overflow-hidden">
-            <div className="p-6 border-b border-neutral flex justify-between items-center">
-              <h2 className="text-xl font-bold text-secondary">
+            <div className="p-4 sm:p-6 border-b border-neutral flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+              <h2 className="text-lg sm:text-xl font-bold text-secondary">
                 {activeTab === 'products' && 'Catálogo de Productos'}
                 {activeTab === 'combos' && 'Catálogo de Combos'}
                 {activeTab === 'posts' && 'Publicaciones del Blog'}

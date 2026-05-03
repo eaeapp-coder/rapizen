@@ -58,11 +58,12 @@ function Layout({ children }: { children: ReactNode }) {
 
   const isDetailPage = location.pathname.startsWith('/producto/') || location.pathname.startsWith('/combo/') || location.pathname.startsWith('/blog/');
   const isAdminPage = location.pathname.startsWith('/admin');
+  const isCheckoutPage = location.pathname.startsWith('/checkout');
 
   return (
     <div className="min-h-screen bg-background font-sans text-secondary flex flex-col">
       {/* Navbar */}
-      {!isDetailPage && !isAdminPage && (
+      {!isDetailPage && !isAdminPage && !isCheckoutPage && (
         <nav className={`fixed w-full z-40 transition-all duration-300 bg-[#4B1E7A] ${isScrolled ? 'py-1.5 shadow-md' : 'py-3'}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center">
@@ -119,7 +120,7 @@ function Layout({ children }: { children: ReactNode }) {
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
-        {isMobileMenuOpen && !isDetailPage && (
+        {isMobileMenuOpen && !isDetailPage && !isCheckoutPage && (
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -151,7 +152,7 @@ function Layout({ children }: { children: ReactNode }) {
       </main>
 
       <Cart />
-      {!isDetailPage && !isAdminPage && (
+      {!isDetailPage && !isAdminPage && !isCheckoutPage && (
         <>
           <WhatsAppButton />
           <footer className="bg-secondary text-white py-12">
