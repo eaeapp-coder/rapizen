@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
 import { ArrowLeft, LayoutGrid, ShoppingBag, Plus, Minus, Star, Leaf, Recycle, Heart, ChevronLeft, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Helmet } from 'react-helmet-async';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,16 @@ export default function ProductDetail() {
   const [showErrorBanner, setShowErrorBanner] = useState(location.state?.showAromaError || false);
   const { addItem, toggleCart, getCartCount } = useCartStore();
   const cartCount = getCartCount();
+
+  const images = product?.images && product.images.length > 0 ? product.images : (product?.image ? [product.image] : []);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    }, 4000); // Rotate every 4 seconds
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   useEffect(() => {
     if (showErrorBanner) {
@@ -93,10 +104,13 @@ export default function ProductDetail() {
     );
   }
 
-  const images = product.images && product.images.length > 0 ? product.images : [product.image];
-
   return (
     <div className="bg-[#F2F2F2] min-h-screen flex flex-col font-sans selection:bg-accent/30 items-center">
+      <Helmet>
+        <title>{product.name} | RapiZen</title>
+        <meta name="description" content={product.description?.substring(0, 150) + "..." || `Comprar ${product.name} en RapiZen`} />
+        {images.length > 0 && <meta property="og:image" content={images[0]} />}
+      </Helmet>
       <div className="w-full max-w-md lg:max-w-4xl flex flex-col min-h-screen relative">
         {/* Top Navigation */}
         <div className="absolute top-0 left-0 right-0 z-[100] px-6 py-8 flex justify-between items-center pointer-events-none">
@@ -157,7 +171,7 @@ export default function ProductDetail() {
         <div className="flex-1 flex flex-col lg:flex-row pt-24 pb-8 lg:px-8 lg:gap-12 lg:items-center">
           {/* Image Section */}
           <div className="relative flex-1 flex flex-col items-center justify-center px-8 mb-12 lg:mb-0 w-full">
-          <div className="w-full aspect-square max-w-md relative flex items-center justify-center">
+          <div className="w-[120%] lg:w-[150%] aspect-square max-w-[600px] lg:max-w-[800px] relative flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.img 
                 key={currentImageIndex}

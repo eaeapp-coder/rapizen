@@ -36,6 +36,8 @@ function ScrollToTop() {
   return null;
 }
 
+import { Helmet } from 'react-helmet-async';
+
 function Layout({ children }: { children: ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,6 +64,11 @@ function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background font-sans text-secondary flex flex-col">
+      <Helmet>
+        <title>RapiZen | Delivery de Aromas y Biodanza</title>
+        <meta name="description" content="Delivery de aromas en bicicleta. Sahumerios, cascadas y biodanza en Salta. Rápido, ecológico y confiable." />
+        <meta name="keywords" content="sahumerios, cascadas, biodanza, delivery de aromas, salta, kalizen" />
+      </Helmet>
       {/* Navbar */}
       {!isDetailPage && !isAdminPage && !isCheckoutPage && (
         <nav className={`fixed w-full z-40 transition-all duration-300 bg-[#4B1E7A] ${isScrolled ? 'py-1.5 shadow-md' : 'py-3'}`}>
@@ -223,9 +230,12 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<Products />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
+            <Route path="/producto/:id/:slug" element={<ProductDetail />} />
             <Route path="/combos" element={<Combos />} />
             <Route path="/combo/:id" element={<ComboDetail />} />
+            <Route path="/combo/:id/:slug" element={<ComboDetail />} />
             <Route path="/blog/:id" element={<PostDetail />} />
+            <Route path="/blog/:id/:slug" element={<PostDetail />} />
             <Route path="/kalizen" element={<KaliZen />} />
             <Route path="/nosotros" element={<About />} />
             <Route path="/faq" element={<FAQ />} />

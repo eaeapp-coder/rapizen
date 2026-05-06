@@ -7,9 +7,12 @@ import { useCartStore } from '../store/cartStore';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductImageSlider from '../components/ProductImageSlider';
 
+import { generateSlug } from '../utils/slugify';
+
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('todos');
+  const [showCategories, setShowCategories] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCartStore();
@@ -46,9 +49,7 @@ export default function Products() {
         <div className="flex items-center justify-between mb-6">
           <div className="w-8"></div> {/* Spacer for centering if needed */}
           <h1 className="text-base font-bold text-gray-900">Buscar Producto</h1>
-          <div className="w-8 h-8 bg-gray-200 rounded-full overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" alt="Avatar" className="w-full h-full object-cover" />
-          </div>
+          <div className="w-8"></div> {/* Spacer for centering */}
         </div>
 
         {/* Search Bar */}
@@ -63,27 +64,29 @@ export default function Products() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="bg-white p-2 rounded-xl shadow-sm text-gray-800 flex flex-col justify-center items-center w-10">
+          <button onClick={() => setShowCategories(!showCategories)} className={`bg-white p-2 rounded-xl shadow-sm text-gray-800 flex flex-col justify-center items-center w-10 ${showCategories ? 'ring-2 ring-accent' : ''}`}>
             <SlidersHorizontal className="w-4 h-4" />
           </button>
         </div>
         
         {/* Categories (Optional, below search) */}
-        <div className="flex overflow-x-auto w-full gap-2 mb-6 hide-scrollbar pb-2">
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-xl whitespace-nowrap text-xs font-semibold transition-all ${
-                activeCategory === category 
-                  ? 'bg-accent text-white shadow-md' 
-                  : 'bg-white text-gray-600 shadow-sm hover:bg-gray-50'
-              }`}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
-        </div>
+        {showCategories && (
+          <div className="flex overflow-x-auto w-full gap-2 mb-6 hide-scrollbar pb-2">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-4 py-2 rounded-xl whitespace-nowrap text-xs font-semibold transition-all ${
+                  activeCategory === category 
+                    ? 'bg-accent text-white shadow-md' 
+                    : 'bg-white text-gray-600 shadow-sm hover:bg-gray-50'
+                }`}
+              >
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Results Info */}
         <div className="mb-4">
@@ -105,7 +108,7 @@ export default function Products() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-[1.5rem] flex flex-col relative shadow-[0_2px_15px_rgba(0,0,0,0.03)] overflow-hidden"
               >
-                <Link to={`/producto/${product.id}`} className="block w-full relative group">
+                <Link to={`/producto/${product.id}/${generateSlug(product.name)}`} className="block w-full relative group">
                   <div className="bg-[#F8F9FA] w-full h-56 sm:h-72 flex items-center justify-center overflow-hidden">
                     <ProductImageSlider 
                       images={product.images || [product.image]} 
@@ -114,7 +117,7 @@ export default function Products() {
                   </div>
                 </Link>
                 <div className="p-4 w-full flex flex-col relative">
-                  <Link to={`/producto/${product.id}`}>
+                  <Link to={`/producto/${product.id}/${generateSlug(product.name)}`}>
                     <h3 className="font-bold text-gray-900 text-[15px] leading-tight mb-1 pr-10">{product.name}</h3>
                     <p className="text-gray-400 text-xs line-clamp-1">{product.category}</p>
                   </Link>
@@ -127,7 +130,7 @@ export default function Products() {
                     onClick={(e) => {
                       e.preventDefault();
                       if (product.aromas && product.aromas.length > 0) {
-                        navigate(`/producto/${product.id}`, { state: { showAromaError: true } });
+                        navigate(`/producto/${product.id}/${generateSlug(product.name)}`, { state: { showAromaError: true } });
                       } else {
                         addItem({ ...product, type: 'product' });
                       }

@@ -6,6 +6,8 @@ import { useCartStore } from '../store/cartStore';
 import { ShoppingBag, Star, Heart, Facebook, Instagram, ArrowRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { generateSlug } from '../utils/slugify';
+
 export default function KaliZen() {
   const navigate = useNavigate();
   const [artesanalProducts, setArtesanalProducts] = useState<any[]>([]);
@@ -137,7 +139,7 @@ export default function KaliZen() {
             {/* Overlapping Main Image */}
             <div className="lg:absolute lg:-bottom-24 lg:-right-12 lg:w-[115%] w-full z-20 shadow-2xl rounded-[32px] overflow-hidden -mt-16 lg:mt-0 relative group">
               <img 
-                src={pageData.gallery[0] || "/images/kalizen-main.svg"} 
+                src="https://www.gesell.gob.ar/image/16715/ARTESANOS%204.jpg" 
                 alt="Diseño destacado" 
                 className="w-full h-[280px] lg:h-[340px] object-cover transition-transform duration-700 group-hover:scale-105"
                 referrerPolicy="no-referrer"
@@ -149,7 +151,7 @@ export default function KaliZen() {
               <span className="text-[10px] lg:text-xs font-bold tracking-widest uppercase mb-3 text-gray-800">Galería</span>
               <div className="w-full h-20 lg:h-24 rounded-[20px] overflow-hidden mb-2 relative group cursor-pointer">
                 <img 
-                  src={pageData.gallery[1] || "/images/kalizen-room.svg"} 
+                  src="https://http2.mlstatic.com/D_NQ_NP_2X_954774-MLA31112133240_062019-F.webp" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   referrerPolicy="no-referrer"
                 />
@@ -278,7 +280,7 @@ export default function KaliZen() {
                   transition={{ duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                   className="group flex flex-col"
                 >
-                  <Link to={`/producto/${product.id}`} className="block relative aspect-[4/5] overflow-hidden mb-3 sm:mb-6 bg-gray-100 rounded-xl sm:rounded-2xl">
+                  <Link to={`/producto/${product.id}/${generateSlug(product.name)}`} className="block relative aspect-[4/5] overflow-hidden mb-3 sm:mb-6 bg-gray-100 rounded-xl sm:rounded-2xl">
                     <img 
                       src={product.image} 
                       alt={product.name} 
@@ -289,7 +291,7 @@ export default function KaliZen() {
                   </Link>
                   <div className="flex flex-col flex-grow">
                     <div className="flex flex-col sm:flex-row justify-between items-start mb-2 sm:mb-3 gap-2 sm:gap-4">
-                      <Link to={`/producto/${product.id}`} className="block">
+                      <Link to={`/producto/${product.id}/${generateSlug(product.name)}`} className="block">
                         <h3 className="font-bold text-base sm:text-2xl group-hover:text-primary transition-colors leading-tight tracking-tight line-clamp-2 sm:line-clamp-none">{product.name}</h3>
                       </Link>
                       <span className="font-medium whitespace-nowrap bg-gray-100 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
@@ -301,7 +303,7 @@ export default function KaliZen() {
                       onClick={(e) => {
                         e.preventDefault();
                         if (product.aromas && product.aromas.length > 0) {
-                          navigate(`/producto/${product.id}`, { state: { showAromaError: true } });
+                          navigate(`/producto/${product.id}/${generateSlug(product.name)}`, { state: { showAromaError: true } });
                         } else {
                           addItem({ ...product, type: 'product' });
                         }

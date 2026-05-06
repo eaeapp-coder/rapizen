@@ -6,6 +6,8 @@ import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
 import { Link } from 'react-router-dom';
 
+import { generateSlug } from '../utils/slugify';
+
 export default function Combos() {
   const [combos, setCombos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +54,7 @@ export default function Combos() {
                 className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl p-1 border border-primary/10 flex flex-col"
               >
                 <div className="bg-white rounded-[1.4rem] p-5 sm:p-6 flex-1 flex flex-col sm:flex-row gap-6 relative">
-                  <Link to={`/combo/${combo.id}`} className="block shrink-0 w-full sm:w-48 overflow-hidden rounded-2xl">
+                  <Link to={`/combo/${combo.id}/${generateSlug(combo.name)}`} className="block shrink-0 w-full sm:w-48 overflow-hidden rounded-2xl">
                     <img 
                       src={combo.image} 
                       alt={combo.name} 
@@ -61,7 +63,7 @@ export default function Combos() {
                     />
                   </Link>
                   <div className="flex-1 flex flex-col min-h-0">
-                    <Link to={`/combo/${combo.id}`}>
+                    <Link to={`/combo/${combo.id}/${generateSlug(combo.name)}`}>
                       <h3 className="font-bold text-xl mb-2 text-primary hover:text-primary/80 transition-colors pr-12 line-clamp-2">{combo.name}</h3>
                     </Link>
                     <p className="text-gray-600 mb-4 flex-grow text-sm">{combo.description}</p>

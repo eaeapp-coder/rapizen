@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Bike, MessageCircle, MapPin, Clock, CreditCard, Truck, ChevronRight, ShoppingBag, Calendar, Sparkles, ChevronLeft, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -7,6 +8,9 @@ import { db } from '../firebase';
 import { useCartStore } from '../store/cartStore';
 import { generateWhatsAppLink } from '../utils/whatsapp';
 import ProductImageSlider from '../components/ProductImageSlider';
+import HeroAnimated from '../components/HeroAnimated';
+
+import { generateSlug } from '../utils/slugify';
 
 export default function Home() {
   const location = useLocation();
@@ -135,66 +139,8 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero Carousel */}
-      {heroSlides.length > 0 && (
-        <section 
-          className="relative w-full h-[50vh] min-h-[300px] overflow-hidden mt-[76px]"
-          onMouseMove={handleMouseMove}
-        >
-          <div 
-            className="absolute inset-0 pointer-events-none transition duration-100 z-20" 
-            style={{ background: `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(255,255,255,0.05) 0%, transparent 40%)` }}
-          />
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0 cursor-pointer"
-              onClick={() => handleSlideClick(heroSlides[currentSlide].link)}
-            >
-              <img 
-                src={heroSlides[currentSlide].image} 
-                alt={`Slide ${currentSlide + 1}`} 
-                className="w-full h-full object-cover object-center"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-black/20"></div>
-            </motion.div>
-          </AnimatePresence>
-
-          {heroSlides.length > 1 && (
-            <>
-              <button 
-                onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full backdrop-blur-sm transition-colors z-10"
-              >
-                <ChevronLeft className="w-6 h-6 text-secondary" />
-              </button>
-              <button 
-                onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full backdrop-blur-sm transition-colors z-10"
-              >
-                <ChevronRight className="w-6 h-6 text-secondary" />
-              </button>
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-                {heroSlides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={(e) => { e.stopPropagation(); setCurrentSlide(index); }}
-                    className={`w-3 h-3 rounded-full transition-colors ${
-                      index === currentSlide ? 'bg-white' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-      )}
-
+      <HeroAnimated />
+      
       {/* Benefits Bar */}
       <section className="bg-primary text-white py-4 md:py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -261,7 +207,7 @@ export default function Home() {
                   className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity group-hover:bg-black/20">
+                <div className="absolute inset-0 bg-gradient-to-t from-violet-600/70 to-transparent flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                   <span className="text-white text-lg font-bold tracking-wider">{cat.name}</span>
                 </div>
               </Link>
@@ -290,7 +236,7 @@ export default function Home() {
                 whileHover={{ y: -5 }}
                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-neutral flex flex-col"
               >
-                <Link to={`/producto/${product.id}`} className="block h-56 sm:h-72 overflow-hidden relative">
+                <Link to={`/producto/${product.id}/${generateSlug(product.name)}`} className="block h-56 sm:h-72 overflow-hidden relative">
                   <ProductImageSlider 
                     images={product.images || [product.image]} 
                     name={product.name} 
@@ -310,7 +256,7 @@ export default function Home() {
                   </div>
                 </Link>
                 <div className="p-3 sm:p-5 flex flex-col flex-grow relative">
-                  <Link to={`/producto/${product.id}`}>
+                  <Link to={`/producto/${product.id}/${generateSlug(product.name)}`}>
                     <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-2 text-secondary hover:text-primary transition-colors line-clamp-2 pr-10">{product.name}</h3>
                   </Link>
                   <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 flex-grow line-clamp-2 sm:line-clamp-3">{product.description}</p>
@@ -318,7 +264,7 @@ export default function Home() {
                     onClick={(e) => {
                       e.preventDefault();
                       if (product.aromas && product.aromas.length > 0) {
-                        navigate(`/producto/${product.id}`, { state: { showAromaError: true } });
+                        navigate(`/producto/${product.id}/${generateSlug(product.name)}`, { state: { showAromaError: true } });
                       } else {
                         addItem({ ...product, type: 'product' });
                       }
@@ -364,7 +310,7 @@ export default function Home() {
                 className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl sm:rounded-3xl p-0.5 sm:p-1 border border-primary/10"
               >
                 <div className="bg-white rounded-[1rem] sm:rounded-[1.4rem] p-3 sm:p-6 h-full flex flex-col sm:flex-row gap-3 sm:gap-6 items-center">
-                  <Link to={`/combo/${combo.id}`} className="block shrink-0">
+                  <Link to={`/combo/${combo.id}/${generateSlug(combo.name)}`} className="block shrink-0">
                     <img 
                       src={combo.image} 
                       alt={combo.name} 
@@ -373,7 +319,7 @@ export default function Home() {
                     />
                   </Link>
                   <div className="flex-1 text-center sm:text-left flex flex-col items-center sm:items-start h-full">
-                    <Link to={`/combo/${combo.id}`}>
+                    <Link to={`/combo/${combo.id}/${generateSlug(combo.name)}`}>
                       <h3 className="font-bold text-sm sm:text-xl mb-1 sm:mb-2 text-primary hover:text-primary/80 transition-colors line-clamp-2">{combo.name}</h3>
                     </Link>
                     <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-4 hidden sm:block">{combo.description}</p>
@@ -470,7 +416,7 @@ export default function Home() {
                   transition={{ delay: index * 0.1 }}
                   className="bg-white rounded-3xl overflow-hidden shadow-sm border border-neutral flex flex-col"
                 >
-                  <Link to={`/blog/${post.id}`} className="block relative h-48 overflow-hidden shrink-0">
+                  <Link to={`/blog/${post.id}/${generateSlug(post.title)}`} className="block relative h-48 overflow-hidden shrink-0">
                     <img 
                       src={post.image} 
                       alt={post.title} 
@@ -483,12 +429,12 @@ export default function Home() {
                       <Calendar className="w-3 h-3 mr-1" />
                       {new Date(post.date).toLocaleDateString('es-AR')}
                     </div>
-                    <Link to={`/blog/${post.id}`}>
+                    <Link to={`/blog/${post.id}/${generateSlug(post.title)}`}>
                       <h3 className="font-bold text-xl mb-3 text-secondary hover:text-primary transition-colors line-clamp-2">{post.title}</h3>
                     </Link>
                     <p className="text-gray-600 text-sm mb-4 flex-grow line-clamp-3">{post.excerpt}</p>
                     <Link 
-                      to={`/blog/${post.id}`}
+                      to={`/blog/${post.id}/${generateSlug(post.title)}`}
                       className="inline-flex items-center text-primary font-medium hover:text-primary/80 transition-colors mt-auto"
                     >
                       Leer más <ChevronRight className="w-4 h-4 ml-1" />
